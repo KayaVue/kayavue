@@ -1,0 +1,15 @@
+/*
+Theme Name: KayaVue
+Theme URI: https://github.com/KayaVue/kayavue
+Author: KayaVue
+Description: An editorial directory for comparing aesthetic procedures, clinics, and patient stories across Indian cities. Demo content is fictional. Not medical advice.
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 6.8
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: kayavue
+*/
+
+/* Styles live in assets/css/main.css so the theme header stays readable. */
