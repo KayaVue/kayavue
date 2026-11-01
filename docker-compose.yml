@@ -1,0 +1,79 @@
+name: kayavue
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-kayavue}
+      MYSQL_USER: ${MYSQL_USER:-kayavue}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-kayavue}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-kayavue-root}
+    command:
+      - --bind-address=0.0.0.0
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=128M
+      - --performance-schema=OFF
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 25s
+    restart: unless-stopped
+
+  wordpress:
+    image: wordpress:6.8-php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WP_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER:-kayavue}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-kayavue}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-kayavue}
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_DEBUG_LOG', true);
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_ENVIRONMENT_TYPE', 'local');
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/themes/kayavue:/var/www/html/wp-content/themes/kayavue
+      - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+    restart: unless-stopped
+
+  wpcli:
+    image: wordpress:cli-php8.2
+    profiles: ["setup"]
+    user: "0:0"
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WP_CLI_ALLOW_ROOT: "1"
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER:-kayavue}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-kayavue}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-kayavue}
+      WP_URL: ${WP_URL:-http://localhost:8080}
+      WP_ADMIN_USER: ${WP_ADMIN_USER:-kayavue}
+      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD:-kayavue-demo}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL:-demo@kayavue.local}
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/themes/kayavue:/var/www/html/wp-content/themes/kayavue
+      - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ./docker/install.sh:/setup/install.sh:ro
+    entrypoint: ["/bin/sh", "/setup/install.sh"]
+
+volumes:
+  db_data:
+  wp_data:

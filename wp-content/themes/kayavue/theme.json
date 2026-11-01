@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.7/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": false,
+    "layout": {
+      "contentSize": "42rem",
+      "wideSize": "70rem"
+    },
+    "color": {
+      "defaultPalette": false,
+      "palette": [
+        { "slug": "paper", "color": "#F3EEE6", "name": "Paper" },
+        { "slug": "ink", "color": "#1A1814", "name": "Ink" },
+        { "slug": "forest", "color": "#16352F", "name": "Forest" },
+        { "slug": "clay", "color": "#8E3B24", "name": "Clay" },
+        { "slug": "card", "color": "#FBF8F3", "name": "Card" }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "slug": "serif",
+          "name": "Fraunces",
+          "fontFamily": "\"Fraunces\", Georgia, serif"
+        },
+        {
+          "slug": "sans",
+          "name": "Outfit",
+          "fontFamily": "\"Outfit\", \"Noto Sans\", sans-serif"
+        }
+      ]
+    }
+  }
+}
